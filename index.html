@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Customer Marketing</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #ff6eb4;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100vh;
+    background: #ff6eb4;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .main-content {
+    flex: 1;
+    padding: 24px 16px 80px;
+    overflow-y: auto;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1.1;
+    text-shadow: 0 2px 8px rgba(180,0,80,0.18);
+    letter-spacing: 1px;
+  }
+  .star {
+    font-size: 22px;
+    color: #fff;
+    position: absolute;
+  }
+  .star-left { top: -6px; left: 10px; }
+  .star-right { top: 10px; right: 10px; }
+  .category-card {
+    background: #fff0f8;
+    border-radius: 22px;
+    margin-bottom: 14px;
+    padding: 14px 16px 14px 14px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+    min-height: 80px;
+    box-shadow: 0 2px 12px rgba(220,50,120,0.08);
+    border: 2.5px solid transparent;
+  }
+  .category-card:active { transform: scale(0.97); }
+  .category-card.selected {
+    border: 2.5px solid #e83d8a;
+    background: #ffe0f4;
+  }
+  .icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff80c0 0%, #e8359a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 14px;
+  }
+  .icon-circle svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .cat-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #c0226a;
+    flex: 1;
+  }
+  .cat-img {
+    height: 62px;
+    object-fit: contain;
+    margin-left: 4px;
+  }
+  .cat-img-placeholder {
+    width: 80px;
+    height: 62px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin-left: 4px;
+  }
+  .deco {
+    position: absolute;
+    right: 92px;
+    top: 8px;
+    font-size: 14px;
+    color: #f080b0;
+    opacity: 0.7;
+  }
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 390px;
+    background: #fff;
+    border-top: 1.5px solid #ffd6ec;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0 16px;
+    z-index: 100;
+    box-shadow: 0 -4px 24px rgba(220,50,120,0.10);
+  }
+  .bar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 14px;
+    border-radius: 14px;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .bar-btn:hover { background: #fff0f8; }
+  .bar-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke: #d0368a;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .bar-label {
+    font-size: 11px;
+    color: #d0368a;
+    font-weight: 600;
+  }
+  .cart-badge {
+    position: absolute;
+    top: -2px;
+    right: 8px;
+    background: #e8359a;
+    color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+    box-shadow: 0 1px 4px rgba(200,0,100,0.3);
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(255,110,180,0.18);
+    backdrop-filter: blur(0px);
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .overlay.active {
+    display: flex;
+  }
+  .cart-sheet {
+    width: 100%;
+    max-width: 390px;
+    background: #fff;
+    border-radius: 28px 28px 0 0;
+    padding: 24px 20px 20px;
+    box-shadow: 0 -8px 40px rgba(200,50,120,0.16);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #c0226a;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #ffe0f4;
+  }
+  .cart-item:last-of-type { border-bottom: none; }
+  .cart-item-img {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    object-fit: contain;
+    background: #fff0f8;
+    padding: 4px;
+  }
+  .cart-item-img-placeholder {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: #fff0f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .cart-item-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: #c0226a;
+  }
+  .cart-item-qty {
+    font-size: 15px;
+    color: #e8359a;
+    font-weight: 700;
+    background: #ffe0f4;
+    border-radius: 10px;
+    padding: 4px 12px;
+  }
+  .continue-btn {
+    margin-top: 18px;
+    width: 100%;
+    background: linear-gradient(90deg, #ff6eb4 0%, #e8359a 100%);
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+    box-shadow: 0 4px 18px rgba(220,50,120,0.22);
+  }
+  .continue-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  .delivery-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(255,110,180,0.18);
+    backdrop-filter: blur(0px);
+    align-items: center;
+    justify-content: center;
+    transition: backdrop-filter 0.5s;
+  }
+  .delivery-overlay.active {
+    display: flex;
+    backdrop-filter: blur(14px);
+  }
+  .delivery-card {
+    background: rgba(255,255,255,0.92);
+    border-radius: 28px;
+    padding: 36px 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 8px 48px rgba(200,50,120,0.22);
+    animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .delivery-icon {
+    font-size: 70px;
+    filter: drop-shadow(0 4px 12px rgba(200,50,120,0.3));
+  }
+  .delivery-text {
+    font-size: 18px;
+    font-weight: 800;
+    color: #c0226a;
+    text-align: center;
+  }
+  .delivery-sub {
+    font-size: 14px;
+    color: #e060a0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="main-content">
+    <div class="header">
+      <span class="star star-left">✦</span>
+      <h1>Brand<br>Advertising</h1>
+      <span class="star star-right">✦</span>
+    </div>
+
+    <div class="category-card" onclick="toggleItem(this,'Косметика','💄')">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="14" rx="3"/><path d="M10 16v4h4v-4"/><line x1="12" y1="2" x2="12" y2="16"/></svg>
+      </div>
+      <span class="cat-name">Cosmetics</span>
+      <span class="deco">✦</span>
+      <div class="cat-img-placeholder">💄</div>
+    </div>
+
+    <div class="category-card" onclick="toggleItem(this,'Взуття','👟')">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><path d="M2 14h3l2-8h10l2 8h3"/><path d="M5 14c0 2.5 1.5 4 4 4h6c2.5 0 4-1.5 4-4"/></svg>
+      </div>
+      <span class="cat-name">Shoes</span>
+      <span class="deco">✦</span>
+      <div class="cat-img-placeholder">👟</div>
+    </div>
+
+    <div class="category-card" onclick="toggleItem(this,'Одяг','👕')">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 001 .74H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.74l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+      </div>
+      <span class="cat-name">Clothes</span>
+      <span class="deco">✦</span>
+      <div class="cat-img-placeholder">👕</div>
+    </div>
+
+    <div class="category-card" onclick="toggleItem(this,'Парфуми','🌸')">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><rect x="6" y="8" width="12" height="14" rx="3"/><path d="M12 8V4m0 0c0-2 3-2 3-4m-3 4c0-2-3-2-3-4"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+      </div>
+      <span class="cat-name">Perfumes</span>
+      <span class="deco">✦</span>
+      <div class="cat-img-placeholder">🌸</div>
+    </div>
+
+    <div class="category-card" onclick="toggleItem(this,'Аксесуари','👜')">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="13" rx="3"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
+      </div>
+      <span class="cat-name">Accessories</span>
+      <span class="deco">✦</span>
+      <div class="cat-img-placeholder">👜</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="bar-btn" onclick="openSettings()" aria-label="Налаштування">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="bar-label">Settings</span>
+    </button>
+    <button class="bar-btn" onclick="openSearch()" aria-label="Пошук">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="bar-label">Search</span>
+    </button>
+    <button class="bar-btn" id="cartBtn" onclick="openCart()" aria-label="Кошик">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-badge" id="cartBadge">0</span>
+      <span class="bar-label">Cart</span>
+    </button>
+  </div>
+</div>
+
+<div class="overlay" id="cartOverlay">
+  <div class="cart-sheet">
+    <div class="sheet-title">🛒 Your Cart</div>
+    <div id="cartList"></div>
+    <button class="continue-btn" onclick="onContinue()">Continue</button>
+  </div>
+</div>
+
+<div class="delivery-overlay" id="deliveryOverlay">
+  <div class="delivery-card">
+    <div class="delivery-icon">🚗</div>
+    <div class="delivery-text">Delivering on the way!</div>
+  </div>
+</div>
+
+<script>
+const selectedItems = {};
+const cartOverlay = document.getElementById('cartOverlay');
+const deliveryOverlay = document.getElementById('deliveryOverlay');
+const cartBadge = document.getElementById('cartBadge');
+
+const cartImages = [
+  { name: 'LV shoes', file: 'buty.png', emoji: '👟' },
+  { name: 'Sol de Janeiro box', file: 'sol.png', emoji: '☀️' },
+  { name: 'Moschino Bubble Gum', file: 'bubble.png', emoji: '🫧' }
+];
+
+function toggleItem(card, name, emoji) {
+  if (selectedItems[name]) {
+    selectedItems[name]++;
+  } else {
+    selectedItems[name] = 1;
+  }
+  card.classList.add('selected');
+  updateBadge();
+}
+
+function updateBadge() {
+  const total = Object.values(selectedItems).reduce((a, b) => a + b, 0);
+  if (total > 0) {
+    cartBadge.style.display = 'flex';
+    cartBadge.textContent = total;
+  } else {
+    cartBadge.style.display = 'none';
+  }
+}
+
+function openCart() {
+  const cartList = document.getElementById('cartList');
+  cartList.innerHTML = '';
+  cartImages.forEach(item => {
+    const qty = selectedItems[item.name] || Math.floor(Math.random() * 2) + 1;
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <div class="cart-item-img-placeholder">${item.emoji}</div>
+      <span class="cart-item-name">${item.file}</span>
+      <span class="cart-item-qty">×${qty}</span>
+    `;
+    cartList.appendChild(div);
+  });
+  cartOverlay.classList.add('active');
+}
+
+function onContinue() {
+  cartOverlay.classList.remove('active');
+  deliveryOverlay.classList.add('active');
+  setTimeout(() => {
+    deliveryOverlay.classList.remove('active');
+  }, 4000);
+}
+
+cartOverlay.addEventListener('click', function(e) {
+  if (e.target === cartOverlay) cartOverlay.classList.remove('active');
+});
+
+deliveryOverlay.addEventListener('click', function() {
+  deliveryOverlay.classList.remove('active');
+});
+
+function openSettings() {
+  alert('⚙️ Налаштування\n(Функція в розробці)');
+}
+function openSearch() {
+  const q = prompt('🔍 Пошук товарів:');
+  if (q) alert('Результати пошуку для: ' + q);
+}
+</script>
+</body>
+</html>
